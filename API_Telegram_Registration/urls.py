@@ -3,11 +3,13 @@ from django.urls import path
 
 from login.views import (
     login_view,
-    create_user
+    create_user,
+    user_page
 )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', login_view, name='login'),
-    path('user/create', create_user, name='user_create')
+    path('user/create', create_user, name='user_create'),
+    path('home', user_page, name='home')
 ]
