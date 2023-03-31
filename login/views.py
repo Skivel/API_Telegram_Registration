@@ -1,8 +1,9 @@
 import json
+import uuid
 
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
@@ -17,29 +18,61 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('login')
+            return redirect('home')
         else:
-            return render(request, 'none.html', {'error': 'Invalid credentials'})
+            return render(request, 'login_page.html', {'error': 'Invalid credentials'})
     else:
         return render(request, 'login_page.html')
 
 
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
+
 @login_required
 def user_page(request):
-    pass
+    user_info = UserInfo.objects.get(user_nickname=request.user)
+    context = {
+        'user': user_info
+    }
+
+    return render(request, 'home_page.html', context)
 
 
 @csrf_exempt
 def create_user(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        user = UserInfo(user_name=data['name'], user_nickname=data['nickname'],
-                        user_email=data['email'], user_password=data['password'])
+    if request.method == 'POST' and 'image' in request.FILES:
+        print(type(request.FILES['image']))
+        print(bool(request.FILES['image']))
+        image_file = request.FILES['image']
+
+        user = User.objects.create_user(username=request.POST.get('nickname'), first_name=request.POST.get('name'),
+                                        password=request.POST.get('password'))
         user.save()
 
-        user = User.objects.create_user(username=data['nickname'], first_name=data['name'],
-                                        email=data['email'], password=data['password'])
+        user_info = UserInfo(user=user, user_name=request.POST.get('name'),
+                             user_nickname=request.POST.get('nickname'), user_email=request.POST.get('email'),
+                             user_password=request.POST.get('password'), user_photo=image_file)
+        user_info.save()
+        return JsonResponse({'status': 'success'})
+
+    elif request.method == 'POST':
+
+        user = User.objects.create_user(username=request.POST.get('nickname'), first_name=request.POST.get('name'),
+                                        password=request.POST.get('password'))
         user.save()
+
+        user_info = UserInfo(user=user, user_name=request.POST.get('name'),
+                             user_nickname=request.POST.get('nickname'), user_email=request.POST.get('email'),
+                             user_password=request.POST.get('password'))
+        user_info.save()
+
         return JsonResponse({'status': 'success'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+
+@csrf_exempt
+def save_photo():
+    pass
