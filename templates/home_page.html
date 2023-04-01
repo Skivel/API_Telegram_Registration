@@ -5,5 +5,37 @@
 
 
 {% block body %}
-<a href="{% url 'logout' %}">LOGOUT</a>
+<div class="container" style="padding-top:15%">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6" style="background-color:#6CC1E3; border-radius: 10px">
+
+            <div class="container" style="padding-top: 20px">
+                <div class="row">
+                    <div class="col-md-4">
+                        {% if user.user_photo %}
+                        <img src="/media/{{ user.user_photo }}" alt="profile-image" width="150" height="150">
+                        {% else %}
+                        <img src="https://www.floridaaikikai.com/new/wp-content/uploads/2016/07/profile-icon-9-150x150.png"
+                             alt="profile-image">
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8" style="padding-top: 25px">
+                        <p><strong>User name:</strong> {{ user.user_name }}</p>
+                        <p><strong>Telegram:</strong> @{{ user.user_nickname }}</p>
+                        <p><strong>Email:</strong> {{ user.user_email }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <br>
+            <div style="padding-left:15px; margin-bottom: 15px">
+                <a href="{% url 'logout' %}" class="btn btn-info">LOGOUT</a>
+                <a href="{% url 'user-delete' %}" class="btn btn-danger">DELETE PROFILE</a>
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+</div>
+
 {% endblock %}
