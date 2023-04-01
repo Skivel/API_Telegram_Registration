@@ -5,7 +5,8 @@ from login.views import (
     login_view,
     logout_view,
     create_user,
-    user_page
+    user_page,
+    UserList
 )
 
 urlpatterns = [
@@ -13,5 +14,6 @@ urlpatterns = [
     path('', login_view, name='login'),
     path('logout', logout_view, name='logout'),
     path('user/create', create_user, name='user_create'),
-    path('home', user_page, name='home')
+    path('home', user_page, name='home'),
+    path('api/v1/users', UserList.as_view(), name='user-list')
 ]
